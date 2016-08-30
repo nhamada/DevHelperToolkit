@@ -20,9 +20,9 @@ extension Dictionary {
             }
             switch value.swiftType {
             case .object(let _):
-                properties.append(PropertyDefinition(name: key, type: .object(key)))
+                properties.append(PropertyDefinition(name: key.lowerCamelCased(), key: key, type: .object(key.upperCamelCased())))
             default:
-                properties.append(PropertyDefinition(name: key, type: value.swiftType))
+                properties.append(PropertyDefinition(name: key.lowerCamelCased(), key: key, type: value.swiftType))
             }
         }
         models.append(ModelDefinition(name: "", properties: properties))
@@ -31,7 +31,7 @@ extension Dictionary {
         for (key, value) in submodels {
             for subModel in value.jsonModels {
                 if subModel.name.isEmpty {
-                    subModel.name = String(describing: key)
+                    subModel.name = String(describing: key.upperCamelCased())
                 }
                 models.append(subModel)
             }

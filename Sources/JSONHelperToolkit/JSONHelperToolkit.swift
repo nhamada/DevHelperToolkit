@@ -11,8 +11,7 @@ import Foundation
 public final class JSONHelperToolkit {
     static let shared: JSONHelperToolkit = JSONHelperToolkit()
     
-    private init() {
-    }
+    private init() { }
     
     func generate(from filepath: String,
                   to outputDirectory: String,
@@ -32,6 +31,14 @@ public final class JSONHelperToolkit {
         }
         guard let jsonModels = dic?.jsonModels else {
             fatalError("Failed to convert")
+        }
+        let topModelName = url.lastPathComponent.replacingOccurrences(of: ".\(url.pathExtension)", with: "").upperCamelCased()
+        for model in jsonModels {
+            if model.name.isEmpty {
+                model.name = topModelName
+            }
+            let contents = model.swiftContents(configuration: configuration)
+            print(contents)
         }
     }
 }

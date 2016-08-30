@@ -7,7 +7,7 @@
 //
 
 public struct JSONHelperToolkitConfiguration {
-    
+    let editorTabSpacing: String
 }
 
-internal let `default` = JSONHelperToolkitConfiguration()
+internal let `default` = JSONHelperToolkitConfiguration(editorTabSpacing: "    ")

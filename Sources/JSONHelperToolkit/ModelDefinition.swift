@@ -6,6 +6,8 @@
 //
 //
 
+import Foundation
+
 indirect enum ModelType {
     case integer, fraction, string, boolean
     case array(ModelType)
@@ -29,22 +31,70 @@ indirect enum ModelType {
     }
 }
 
-class PropertyDefinition {
+final class PropertyDefinition {
     let name: String
+    let key: String
     let type: ModelType
     
-    init(name: String, type: ModelType) {
+    init(name: String, key: String, type: ModelType) {
         self.name = name
+        self.key = key
         self.type = type
     }
 }
 
-class ModelDefinition {
+final class ModelDefinition {
     var name: String
     var properties: [PropertyDefinition]
     
     init(name: String = "", properties: [PropertyDefinition] = []) {
         self.name = name
         self.properties = properties
+    }
+}
+
+extension ModelDefinition {
+    func swiftContents(configuration: JSONHelperToolkitConfiguration) -> String {
+        let tab = configuration.editorTabSpacing
+        
+        var lines = [String]()
+        lines.append("import Foundation")
+        lines.append("")
+        
+        lines.append("struct \(name) {")
+        for property in properties {
+            lines.append("\(tab)let \(property.name): \(property.type.swiftType)")
+        }
+        lines.append("}")
+        lines.append("")
+        lines.append("extension \(name) {")
+        lines.append("\(tab)static func decode(_ jsonObject: [String:Any]) -> \(name) {")
+        for property in properties {
+            switch property.type {
+            case .object(let typeName):
+                lines.append("\(tab)\(tab)guard let \(property.name)Object = jsonObject[\"\(property.key)\"] as? \(typeName) else {")
+                lines.append("\(tab)\(tab)\(tab)abort()")
+                lines.append("\(tab)\(tab)}")
+                lines.append("\(tab)\(tab)let \(property.name) = \(typeName).decode(\(property.name)Object)")
+                break
+            default:
+                lines.append("\(tab)\(tab)guard let \(property.name) = jsonObject[\"\(property.key)\"] as? \(property.type.swiftType) else {")
+                lines.append("\(tab)\(tab)\(tab)abort()")
+                lines.append("\(tab)\(tab)}")
+            }
+        }
+        lines.append("\(tab)\(tab)return \(name)(")
+        for property in properties.dropLast() {
+            lines.append("\(tab)\(tab)\(tab)\(property.name): \(property.name),")
+        }
+        guard let last = properties.last else {
+            abort()
+        }
+        lines.append("\(tab)\(tab)\(tab)\(last.name): \(last.name)")
+        lines.append("\(tab)\(tab))")
+        lines.append("\(tab)}")
+        lines.append("}")
+        
+        return lines.reduce("") { $0 + $1 + "\n" }
     }
 }
