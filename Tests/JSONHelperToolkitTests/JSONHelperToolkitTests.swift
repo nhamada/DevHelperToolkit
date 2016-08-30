@@ -26,14 +26,12 @@ class JSONHelperToolkitTests: XCTestCase {
     
     func testReadFromJsonSimple() {
         let filepath = "./Resources/test_simple.json"
-        let jsonToolkit = JSONHelperToolkit()
-        jsonToolkit.generate(withFilepath: filepath, toDirectory: "./Resources")
+        JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
     }
     
     func testReadFromJsonUserData() {
         let filepath = "./Resources/test_userdata.json"
-        let jsonToolkit = JSONHelperToolkit()
-        jsonToolkit.generate(withFilepath: filepath, toDirectory: "./Resources")
+        JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
     }
     
     static var allTests : [(String, (JSONHelperToolkitTests) -> () throws -> Void)] {
