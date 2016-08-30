@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class JSONHelperToolkit {
+public final class JSONHelperToolkit {
     func generate(withFilepath filepath: String,
                   toDirectory outputDirectory: String,
                   withConfiguration configuration: JSONHelperToolkitConfiguration = `default`) {
@@ -24,6 +24,9 @@ public class JSONHelperToolkit {
         }
         guard let dic = try? JSONSerialization.jsonObject(with: rawData, options: []) as? [String:Any] else {
             fatalError("File may not JSON")
+        }
+        guard let jsonModels = dic?.jsonModels else {
+            fatalError("Failed to convert")
         }
     }
 }

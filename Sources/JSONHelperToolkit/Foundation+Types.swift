@@ -84,7 +84,29 @@ extension Double: JSONValueTypeAnnotetable {
     }
 }
 
+extension NSNumber: JSONValueTypeAnnotetable {
+    internal var swiftType: ModelType {
+        let objcType = String(cString: objCType)
+        switch objcType {
+        case "c", "C", "B":
+            return .boolean
+        case "i", "s", "l", "q", "I", "S", "L", "Q":
+            return .integer
+        case "f", "d":
+            return .fraction
+        default:
+            fatalError("Type mismatch")
+        }
+    }
+}
+
 extension String: JSONValueTypeAnnotetable {
+    internal var swiftType: ModelType {
+        return .string
+    }
+}
+
+extension NSString: JSONValueTypeAnnotetable {
     internal var swiftType: ModelType {
         return .string
     }
@@ -102,7 +124,20 @@ extension Array: JSONValueTypeAnnotetable {
     }
 }
 
+extension NSArray: JSONValueTypeAnnotetable {
+    internal var swiftType: ModelType {
+        let array = self as Array<AnyObject>
+        return array.swiftType
+    }
+}
+
 extension Dictionary: JSONValueTypeAnnotetable {
+    internal var swiftType: ModelType {
+        return .object("")
+    }
+}
+
+extension NSDictionary: JSONValueTypeAnnotetable {
     internal var swiftType: ModelType {
         return .object("")
     }
