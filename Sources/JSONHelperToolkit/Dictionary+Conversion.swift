@@ -19,8 +19,10 @@ extension Dictionary {
                 fatalError("Failed to convert JSON value type")
             }
             switch value.swiftType {
-            case .object(let _):
+            case .object:
                 properties.append(PropertyDefinition(name: key.lowerCamelCased(), key: key, type: .object(key.upperCamelCased())))
+            case .array(.object):
+                properties.append(PropertyDefinition(name: key.lowerCamelCased(), key: key, type: .array(.object(key.upperCamelCased()))))
             default:
                 properties.append(PropertyDefinition(name: key.lowerCamelCased(), key: key, type: value.swiftType))
             }
@@ -44,16 +46,21 @@ extension Dictionary {
         for (key, value) in self {
             let key = String(describing: key)
             switch value {
-            case is Dictionary:
+            case is Dictionary, is NSDictionary:
                 guard let value = value as? Dictionary else {
                     fatalError("Failed to cast")
                 }
                 dics[key] = value
-            case is NSDictionary:
-                guard let value = value as? Dictionary else {
+            case is [Dictionary]:
+                guard let array = value as? [Dictionary], let first = array.first else {
                     fatalError("Failed to cast")
                 }
-                dics[key] = value
+                dics[key] = first
+            case is [NSDictionary]:
+                guard let array = value as? [NSDictionary], let first = array.first as? Dictionary else {
+                    fatalError("Failed to cast")
+                }
+                dics[key] = first
             default:
                 break
             }
