@@ -67,16 +67,27 @@ extension ModelDefinition {
         }
         lines.append("}")
         lines.append("")
-        lines.append("extension \(name) {")
+        lines.append("extension \(name): JSONDecodable {")
         lines.append("\(tab)static func decode(_ jsonObject: [String:Any]) -> \(name) {")
         for property in properties {
             switch property.type {
             case .object(let typeName):
-                lines.append("\(tab)\(tab)guard let \(property.name)Object = jsonObject[\"\(property.key)\"] as? \(typeName) else {")
+                lines.append("\(tab)\(tab)guard let \(property.name)Object = jsonObject[\"\(property.key)\"] as? [String:Any] else {")
                 lines.append("\(tab)\(tab)\(tab)abort()")
                 lines.append("\(tab)\(tab)}")
                 lines.append("\(tab)\(tab)let \(property.name) = \(typeName).decode(\(property.name)Object)")
-                break
+            case .array(let modelType):
+                switch modelType {
+                case .object(let name):
+                    lines.append("\(tab)\(tab)guard let \(property.name)Object = jsonObject[\"\(property.key)\"] as? [[String:Any]] else {")
+                    lines.append("\(tab)\(tab)\(tab)abort()")
+                    lines.append("\(tab)\(tab)}")
+                    lines.append("\(tab)\(tab)let \(property.name) = \(property.name)Object.map { \(name).decode($0) }")
+                default:
+                    lines.append("\(tab)\(tab)guard let \(property.name) = jsonObject[\"\(property.key)\"] as? \(property.type.swiftType) else {")
+                    lines.append("\(tab)\(tab)\(tab)abort()")
+                    lines.append("\(tab)\(tab)}")
+                }
             default:
                 lines.append("\(tab)\(tab)guard let \(property.name) = jsonObject[\"\(property.key)\"] as? \(property.type.swiftType) else {")
                 lines.append("\(tab)\(tab)\(tab)abort()")

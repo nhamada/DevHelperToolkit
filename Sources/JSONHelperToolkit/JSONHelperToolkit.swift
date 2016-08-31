@@ -33,12 +33,34 @@ public final class JSONHelperToolkit {
             fatalError("Failed to convert")
         }
         let topModelName = url.lastPathComponent.replacingOccurrences(of: ".\(url.pathExtension)", with: "").upperCamelCased()
+        let outputDirectoryUrl = URL(fileURLWithPath: outputDirectory)
         for model in jsonModels {
             if model.name.isEmpty {
                 model.name = topModelName
             }
             let contents = model.swiftContents(configuration: configuration)
-            print(contents)
+            let outputUrl = outputDirectoryUrl.appendingPathComponent("\(model.name).swift")
+            do {
+                try contents.write(to: outputUrl, atomically: true, encoding: .utf8)
+            } catch let error {
+                fatalError(error.localizedDescription)
+            }
+        }
+        
+        generateProtocol(to: outputDirectoryUrl, withConfiguration: configuration)
+    }
+    
+    func generateProtocol(to outputDirectoryUrl: URL,
+                          withConfiguration configuration: JSONHelperToolkitConfiguration = `default`) {
+        let lines = ["protocol JSONDecodable {",
+                     "\(configuration.editorTabSpacing)static func decode(_ jsonObject: [String:Any]) -> Self",
+                     "}"]
+        let contents = lines.reduce("") { $0 + $1 + "\n" }
+        let outputUrl = outputDirectoryUrl.appendingPathComponent("JSONDecodable.swift")
+        do {
+            try contents.write(to: outputUrl, atomically: true, encoding: .utf8)
+        } catch let error {
+            fatalError(error.localizedDescription)
         }
     }
 }

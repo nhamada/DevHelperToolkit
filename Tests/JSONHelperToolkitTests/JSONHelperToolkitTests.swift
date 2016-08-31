@@ -34,12 +34,18 @@ class JSONHelperToolkitTests: XCTestCase {
         JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
     }
     
+    func testReadFromJsonMultiUserData() {
+        let filepath = "./Resources/test_multi_userdata.json"
+        JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
+    }
+    
     static var allTests : [(String, (JSONHelperToolkitTests) -> () throws -> Void)] {
         return [
             ("testDictionaryToModel", testDictionaryToModel),
             ("testDictionariesToModel", testDictionariesToModel),
             ("testReadFromJsonSimple", testReadFromJsonSimple),
             ("testReadFromJsonUserData", testReadFromJsonUserData),
+            ("testReadFromJsonMultiUserData", testReadFromJsonMultiUserData),
         ]
     }
 }
