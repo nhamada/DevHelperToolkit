@@ -1,0 +1,12 @@
+{
+    "user_data": {
+        "id": 1,
+        "name": "Test User",
+        "follow_ids": [
+            10, 15, 20
+        ],
+        "follower_ids": [
+            2, 3, 4, 5
+        ],
+    }
+}
