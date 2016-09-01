@@ -15,6 +15,9 @@ extension Dictionary {
         var properties = [PropertyDefinition]()
         for (key, value) in self {
             let key = String(describing: key)
+            if value is NSNull {
+                continue
+            }
             guard let value = value as? JSONValueTypeAnnotetable else {
                 fatalError("Failed to convert JSON value type")
             }

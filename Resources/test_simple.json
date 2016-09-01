@@ -3,5 +3,6 @@
     "integer": 15,
     "fraction": 1.5,
     "integer-as-fraction": 4.0,
-    "boolean": false
+    "boolean": false,
+    "null": null
 }
