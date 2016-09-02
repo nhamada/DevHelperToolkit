@@ -9,20 +9,20 @@
 import Foundation
 
 public final class JSONHelperToolkit {
-    static let shared: JSONHelperToolkit = JSONHelperToolkit()
+    public static let shared: JSONHelperToolkit = JSONHelperToolkit()
     
     private init() { }
     
-    func generate(from filepath: String,
-                  to outputDirectory: String,
-                  withConfiguration configuration: JSONHelperToolkitConfiguration = `default`) {
+    public func generate(from filepath: String,
+                         to outputDirectory: String,
+                         withConfiguration configuration: JSONHelperToolkitConfiguration = `default`) {
         let url = URL(fileURLWithPath: filepath)
         generate(from: url, to: outputDirectory, withConfiguration: configuration)
     }
     
-    func generate(from url: URL,
-                  to outputDirectory: String,
-                  withConfiguration configuration: JSONHelperToolkitConfiguration = `default`) {
+    public func generate(from url: URL,
+                         to outputDirectory: String,
+                         withConfiguration configuration: JSONHelperToolkitConfiguration = `default`) {
         guard let rawData = try? Data(contentsOf: url) else {
             fatalError("Failed to open \(url)")
         }
