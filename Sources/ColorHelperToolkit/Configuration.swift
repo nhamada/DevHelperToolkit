@@ -9,7 +9,6 @@
 import Foundation
 
 public struct ColorHelperToolkitConfiguration {
-    
     public enum TargetPlatform: String {
         case ios
         case osx
@@ -35,6 +34,10 @@ public struct ColorHelperToolkitConfiguration {
     
     let editorTabSpacing: String
     let platform: TargetPlatform
+    
+    public static func configuration(platform: TargetPlatform) -> ColorHelperToolkitConfiguration {
+        return ColorHelperToolkitConfiguration(editorTabSpacing: `default`.editorTabSpacing, platform: platform)
+    }
 }
 
 internal let `default` = ColorHelperToolkitConfiguration(editorTabSpacing: "    ", platform: .ios)
