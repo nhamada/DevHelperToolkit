@@ -8,6 +8,7 @@
 
 import Foundation
 import JSONHelperToolkit
+import ColorHelperToolkit
 
 public final class DevHelperToolkit {
     let args: [String]
@@ -23,6 +24,11 @@ public final class DevHelperToolkit {
             let inputFile = option.inputFile
             let outputDirectory = option.outputDirectory
             JSONHelperToolkit.shared.generate(from: inputFile, to: outputDirectory)
+        case .color:
+            let inputFile = option.inputFile
+            let outputDirectory = option.outputDirectory
+            let configuration = ColorHelperToolkitConfiguration.configuration(platform: option.targetPlatform)
+            ColorHelperToolkit.shared.generate(from: inputFile, to: outputDirectory, withConfiguration: configuration)
         }
     }
 }
@@ -33,6 +39,16 @@ extension ToolkitOption {
         case .json:
             for param in self.parameters {
                 guard let param = param as? JsonToolkitParameter else {
+                    return ""
+                }
+                if case .inputFile(source: let source) = param.type {
+                    return source
+                }
+            }
+            return ""
+        case .color:
+            for param in self.parameters {
+                guard let param = param as? ColorToolkitParameter else {
                     return ""
                 }
                 if case .inputFile(source: let source) = param.type {
@@ -55,6 +71,36 @@ extension ToolkitOption {
                 }
             }
             return "."
+        case .color:
+            for param in self.parameters {
+                guard let param = param as? ColorToolkitParameter else {
+                    return "."
+                }
+                if case .outputDirectory(name: let directory) = param.type {
+                    return directory
+                }
+            }
+            return "."
+        }
+    }
+    
+    var targetPlatform: ColorHelperToolkitConfiguration.TargetPlatform {
+        switch self.mode {
+        case .color:
+            for param in self.parameters {
+                guard let param = param as? ColorToolkitParameter else {
+                    fatalError("Invalid parameter")
+                }
+                if case .targetPlatform(name: let platformName) = param.type {
+                    guard let platform = ColorHelperToolkitConfiguration.TargetPlatform(rawValue: platformName) else {
+                        fatalError("Invalid platform")
+                    }
+                    return platform
+                }
+            }
+            return .ios
+        default:
+            fatalError("Invalid option")
         }
     }
 }
