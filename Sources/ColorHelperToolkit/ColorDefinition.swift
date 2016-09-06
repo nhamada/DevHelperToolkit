@@ -6,6 +6,8 @@
 //
 //
 
+import Foundation
+
 struct ColorDefinition {
     let name: String
     let red: Double
@@ -23,5 +25,14 @@ struct ColorDefinition {
     
     init(name: String, colorValue: ColorValue) {
         self.init(name: name, red: colorValue.red, green: colorValue.green, blue: colorValue.blue, alpha: colorValue.alpha)
+    }
+    
+    func initializeStatement(platform: ColorHelperToolkitConfiguration.TargetPlatform) -> String {
+        return "\(platform.className)(red: \(red), green: \(green), blue: \(blue), alpha: \(alpha))"
+    }
+    
+    var propertyName: String {
+        let comps = name.components(separatedBy: CharacterSet(charactersIn: " -_"))
+        return comps.dropFirst().reduce(comps[0], { $0 + $1.capitalized })
     }
 }

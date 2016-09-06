@@ -28,8 +28,32 @@ public final class ColorHelperToolkit {
         }
         let parser = fileType.parser()
         let models = parser.parse(url: url)
-        for m in models {
-            print(m)
+        let contents = makeContents(models, configuration)
+        
+        let outputDirUrl = URL(fileURLWithPath: outputDirectory)
+        let destination = outputDirUrl.appendingPathComponent("\(configuration.platform.className)+Extension.swift")
+        do {
+            try contents.write(to: destination, atomically: true, encoding: .utf8)
+        } catch let error {
+            fatalError(error.localizedDescription)
         }
+    }
+    
+    private func makeContents(_ models: [ColorDefinition], _ configuration: ColorHelperToolkitConfiguration) -> String {
+        let platform = configuration.platform
+        let tab = configuration.editorTabSpacing
+        var contents = [String]()
+        
+        contents.append("import \(platform.framework)")
+        contents.append("")
+        contents.append("extension \(platform.className) {")
+        for m in models {
+            contents.append("\(tab)var \(m.propertyName): \(platform.className) {")
+            contents.append("\(tab)\(tab)return \(m.initializeStatement(platform: platform))")
+            contents.append("\(tab)}")
+        }
+        contents.append("}")
+        
+        return contents.reduce("") { $0 + $1 + "\n" }
     }
 }
