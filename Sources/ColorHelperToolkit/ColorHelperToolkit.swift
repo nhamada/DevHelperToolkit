@@ -48,7 +48,7 @@ public final class ColorHelperToolkit {
         contents.append("")
         contents.append("extension \(platform.className) {")
         for m in models {
-            contents.append("\(tab)var \(m.propertyName): \(platform.className) {")
+            contents.append("\(tab)class var \(m.propertyName): \(platform.className) {")
             contents.append("\(tab)\(tab)return \(m.initializeStatement(platform: platform))")
             contents.append("\(tab)}")
         }
