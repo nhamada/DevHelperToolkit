@@ -9,6 +9,7 @@
 import Foundation
 import JSONHelperToolkit
 import ColorHelperToolkit
+import ImageHelperToolkit
 
 public final class DevHelperToolkit {
     let args: [String]
@@ -27,8 +28,13 @@ public final class DevHelperToolkit {
         case .color:
             let inputFile = option.inputFile
             let outputDirectory = option.outputDirectory
-            let configuration = ColorHelperToolkitConfiguration.configuration(platform: option.targetPlatform)
+            let configuration = ColorHelperToolkitConfiguration.configuration(platform: option.colorTargetPlatform)
             ColorHelperToolkit.shared.generate(from: inputFile, to: outputDirectory, withConfiguration: configuration)
+        case .image:
+            let inputFile = option.inputFile
+            let outputDirectory = option.outputDirectory
+            let configuration = ImageHelperToolkitConfiguration.configuration(platform: option.imageTargetPlatform)
+            ImageHelperToolkit.shared.generate(from: inputFile, to: outputDirectory, withConfiguration: configuration)
         }
     }
 }
@@ -52,6 +58,16 @@ extension ToolkitOption {
                     return ""
                 }
                 if case .inputFile(source: let source) = param.type {
+                    return source
+                }
+            }
+            return ""
+        case .image:
+            for param in self.parameters {
+                guard let param = param as? ImageToolkitParameter else {
+                    return ""
+                }
+                if case .inputAssetDirectory(source: let source) = param.type {
                     return source
                 }
             }
@@ -81,10 +97,20 @@ extension ToolkitOption {
                 }
             }
             return "."
+        case .image:
+            for param in self.parameters {
+                guard let param = param as? ImageToolkitParameter else {
+                    return "."
+                }
+                if case .outputDirectory(name: let directory) = param.type {
+                    return directory
+                }
+            }
+            return "."
         }
     }
     
-    var targetPlatform: ColorHelperToolkitConfiguration.TargetPlatform {
+    var colorTargetPlatform: ColorHelperToolkitConfiguration.TargetPlatform {
         switch self.mode {
         case .color:
             for param in self.parameters {
@@ -93,6 +119,26 @@ extension ToolkitOption {
                 }
                 if case .targetPlatform(name: let platformName) = param.type {
                     guard let platform = ColorHelperToolkitConfiguration.TargetPlatform(rawValue: platformName) else {
+                        fatalError("Invalid platform")
+                    }
+                    return platform
+                }
+            }
+            return .ios
+        default:
+            fatalError("Invalid option")
+        }
+    }
+    
+    var imageTargetPlatform: ImageHelperToolkitConfiguration.TargetPlatform {
+        switch self.mode {
+        case .image:
+            for param in self.parameters {
+                guard let param = param as? ImageToolkitParameter else {
+                    fatalError("Invalid parameter")
+                }
+                if case .targetPlatform(name: let platformName) = param.type {
+                    guard let platform = ImageHelperToolkitConfiguration.TargetPlatform(rawValue: platformName) else {
                         fatalError("Invalid platform")
                     }
                     return platform
