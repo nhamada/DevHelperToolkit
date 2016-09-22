@@ -8,14 +8,14 @@
 
 enum FileType: String {
     case json
-    case cvs
+    case csv
     
     func parser() -> Parser {
         switch self {
         case .json:
             return JSONParser()
-        case .cvs:
-            return CVSParser()
+        case .csv:
+            return CSVParser()
         }
     }
 }
