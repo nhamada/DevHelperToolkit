@@ -144,7 +144,7 @@ private final class ColorParameterParer {
         }
         var current = [ToolkitParameter]()
         var rest = [ToolkitParameter]()
-        if first.hasSuffix(".json") {
+        if first.hasSuffix(".json") || first.hasSuffix(".csv") {
             current.append(ColorToolkitParameter(shortName: "", longName: "", type: .inputFile(source: first)))
             rest = parse(parameters: Array(parameters.dropFirst()))
         } else {
