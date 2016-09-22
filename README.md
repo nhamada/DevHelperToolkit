@@ -4,9 +4,10 @@ Swiftプログラマー向けの開発サポートキット
 以下のことが行えます。
 * JSONのデータモデルの自動生成
 * `UIColor`/`NSColor`のプロパティにアプリ用の定義を追加したExtensionの自動生成
+* Imageアセットから`UIImage`/`NSImage`の名前空間にアセット名に対応した`enum`の定義を追加したExtensionの自動生成
 
 # Swift version
-`swift-DEVELOPMENT-SNAPSHOT-2016-08-23-a`
+`swift-DEVELOPMENT-SNAPSHOT-2016-09-12-a`
 
 # ビルド方法
 ```
@@ -76,13 +77,14 @@ let testUserData = TestUserdata.decode(dic)
 DevHelperToolkit color [-o output_directory] [-p {ios, osx}] input_file
 ```
 
-`input_file`で指定されたJSONファイルに対応する`UIColor`/`NSColor`のExtensionのswiftファイルを`output_directory`に指定されたディレクトリに出力します。
+`input_file`で指定されたJSONファイル、または、CSVファイルに対応する`UIColor`/`NSColor`のExtensionのswiftファイルを`output_directory`に指定されたディレクトリに出力します。
 `output_directory`が未指定の場合は、カレントディレクトリに作成します。
 `-p ios`で、iOS用 (=`UIColor`)のExtensionを作成します。
 `-p osx`で、macOS用 (=`NSColor`)のExtensionを作成します。
 `-p`オプションが未指定の場合は、iOS用にExtensionを作成します。
 
 ### 例
+#### JSON
 以下のようなJSONファイル(`./Resources/test_color.json`)に対して、Extensionを作成するとします。
 
 ```
@@ -100,13 +102,36 @@ DevHelperToolkit color [-o output_directory] [-p {ios, osx}] input_file
 このファイルに対し、以下のコマンドを実行します。
 
 ```
-DevHelperToolkit color ./Resources/test_userdata.json
+DevHelperToolkit color ./Resources/test_color.json
 ```
 
 コマンド実行後、カレントディレクトリに`UIColor+Extension.swift`というファイルが作成されます。
 このファイルをプロジェクトに追加すると、`UIColor.###`でJSONファイルで指定した色を取得できます。
 
-### JSONでの色の指定方法
+#### CSV
+
+以下のようなCSVファイル(`./Resources/test_color.csv`)に対して、Extensionを作成するとします。
+
+```
+theme_white,000000
+theme_black,ffffff
+theme_clear,00000000
+theme_gray,180
+theme_black_over,300
+web-safe-1,FF6699
+theme_gray2,0.8
+```
+
+このファイルに対し、以下のコマンドを実行します。
+
+```
+DevHelperToolkit color ./Resources/test_color.csv
+```
+
+コマンド実行後、カレントディレクトリに`UIColor+Extension.swift`というファイルが作成されます。
+このファイルをプロジェクトに追加すると、`UIColor.###`でJSONファイルで指定した色を取得できます。
+
+### 色の指定方法
 * 文字列で指定する場合
   * 16進数の文字列でRGB、もしくは、RGBAの順番で指定してください。
 * 数値で指定する場合
@@ -115,3 +140,35 @@ DevHelperToolkit color ./Resources/test_userdata.json
 
 ### 制限
 色の名前の指定でチェックを行っていないため、`white`などの定義済みの名前を指定するとビルド時にエラーになります。
+
+## Image
+```
+DevHelperToolkit image [-o output_directory] [-p {ios, osx}] input_asset_directory
+```
+
+`input_asset_directory`で指定されたアセットのディレクトリに対応する`UIImage`/`NSImage`のExtensionのswiftファイルを`output_directory`に指定されたディレクトリに出力します。
+`output_directory`が未指定の場合は、カレントディレクトリに作成します。
+`-p ios`で、iOS用 (=`UIImage`)のExtensionを作成します。
+`-p osx`で、macOS用 (=`NSImage`)のExtensionを作成します。
+`-p`オプションが未指定の場合は、iOS用にExtensionを作成します。
+
+### 例
+以下のような構成のアセットに対して、Extensionを作成するとします。
+
+```
++ Assets.xcassets
++- AppIcon.appiconset
++- Monster.imageset
++- Player.imageset
++- misc
+   +- Projectile.imageset
+```
+
+このアセットに対し、以下のコマンドを実行します。
+
+```
+DevHelperToolkit image Assets.xcassets
+```
+
+コマンド実行後、カレントディレクトリに`UIImage+Extension.swift`というファイルが作成されます。
+このファイルをプロジェクトに追加すると、`UIImage.asset.###.image`でアセットとして定義されている画像の`UIImage`を取得できます。

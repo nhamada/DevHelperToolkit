@@ -10,7 +10,7 @@ class ColorHelperToolkitTests: XCTestCase {
     
     func testReadFromCsv() {
         let filepath = "./Resources/test_color.csv"
-        ColorHelperToolkit.shared.generate(from: filepath, to: "./Resources/Outputs")
+        ColorHelperToolkit.shared.generate(from: filepath, to: "./Resources")
     }
     
     static var allTests : [(String, (ColorHelperToolkitTests) -> () throws -> Void)] {
