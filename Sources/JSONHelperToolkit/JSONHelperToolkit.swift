@@ -34,6 +34,16 @@ public final class JSONHelperToolkit {
         }
         let topModelName = url.lastPathComponent.replacingOccurrences(of: ".\(url.pathExtension)", with: "").upperCamelCased()
         let outputDirectoryUrl = URL(fileURLWithPath: outputDirectory)
+        
+        generateProtocol(to: outputDirectoryUrl, withConfiguration: configuration)
+        
+        let hasDate = jsonModels.reduce(false) {
+            return $0 || $1.hasDate()
+        }
+        if hasDate {
+            generateDateExtension(to: outputDirectoryUrl, withConfiguration: configuration)
+        }
+        
         for model in jsonModels {
             if model.name.isEmpty {
                 model.name = topModelName
@@ -46,8 +56,6 @@ public final class JSONHelperToolkit {
                 fatalError(error.localizedDescription)
             }
         }
-        
-        generateProtocol(to: outputDirectoryUrl, withConfiguration: configuration)
     }
     
     func generateProtocol(to outputDirectoryUrl: URL,
@@ -55,10 +63,30 @@ public final class JSONHelperToolkit {
         let lines = ["protocol JSONDecodable {",
                      "\(configuration.editorTabSpacing)static func decode(_ jsonObject: [String:Any]) -> Self",
                      "}"]
-        let contents = lines.reduce("") { $0 + $1 + "\n" }
-        let outputUrl = outputDirectoryUrl.appendingPathComponent("JSONDecodable.swift")
+        let fileUrl = outputDirectoryUrl.appendingPathComponent("JSONDecodable.swift")
+        write(contents: lines, to: fileUrl)
+    }
+    
+    func generateDateExtension(to outputDirectoryUrl: URL,
+                               withConfiguration configuration: JSONHelperToolkitConfiguration = `default`) {
+        let lines = ["import Foundation",
+                     "",
+                     "extension DateFormatter {",
+                     "\(configuration.editorTabSpacing)class var iso8601formatter: DateFormatter {",
+                     "\(configuration.editorTabSpacing)\(configuration.editorTabSpacing)let formatter = DateFormatter()",
+                     "\(configuration.editorTabSpacing)\(configuration.editorTabSpacing)formatter.dateFormat = \"yyyy-MM-dd'T'HH:mm:ssZ\"",
+                     "\(configuration.editorTabSpacing)\(configuration.editorTabSpacing)return formatter",
+                     "\(configuration.editorTabSpacing)}",
+                     "}"
+        ]
+        let fileUrl = outputDirectoryUrl.appendingPathComponent("DateFormatter+ISO8601.swift")
+        write(contents: lines, to: fileUrl)
+    }
+    
+    private func write(contents: [String], to outputFileUrl: URL) {
+        let contents = contents.reduce("") { $0 + $1 + "\n" }
         do {
-            try contents.write(to: outputUrl, atomically: true, encoding: .utf8)
+            try contents.write(to: outputFileUrl, atomically: true, encoding: .utf8)
         } catch let error {
             fatalError(error.localizedDescription)
         }

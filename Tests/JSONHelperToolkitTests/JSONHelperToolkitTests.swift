@@ -34,13 +34,18 @@ class JSONHelperToolkitTests: XCTestCase {
         JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
     }
     
-    func testReadFromJsonMultiUserData() {
-        let filepath = "./Resources/test_multi_userdata.json"
-        JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
-    }
+//    func testReadFromJsonMultiUserData() {
+//        let filepath = "./Resources/test_multi_userdata.json"
+//        JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
+//    }
     
     func testReadFromSimpleJsonModel() {
         let filepath = "./Resources/test_simple_json_model.json"
+        JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
+    }
+    
+    func testReadFromSimpleUrlDate() {
+        let filepath = "./Resources/test_simple_url_date.json"
         JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
     }
     
@@ -50,7 +55,9 @@ class JSONHelperToolkitTests: XCTestCase {
             ("testDictionariesToModel", testDictionariesToModel),
             ("testReadFromJsonSimple", testReadFromJsonSimple),
             ("testReadFromJsonUserData", testReadFromJsonUserData),
-            ("testReadFromJsonMultiUserData", testReadFromJsonMultiUserData),
+//            ("testReadFromJsonMultiUserData", testReadFromJsonMultiUserData),
+            ("testReadFromSimpleJsonModel", testReadFromSimpleJsonModel),
+            ("testReadFromSimpleUrlDate", testReadFromSimpleUrlDate),
         ]
     }
 }

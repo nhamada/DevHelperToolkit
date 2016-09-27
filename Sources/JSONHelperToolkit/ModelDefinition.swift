@@ -81,7 +81,7 @@ indirect enum ModelType {
             case 8, 16, 32, 64:
                 return .signedInteger(bit)
             default:
-                abort()
+                fatalError("Invalid bitwide: \(bit)")
             }
         case let s where s.hasPrefix("UInt"):
             guard let bit = Int(s.replacingOccurrences(of: "UInt", with: "")) else {
@@ -91,7 +91,7 @@ indirect enum ModelType {
             case 8, 16, 32, 64:
                 return .unsignedInteger(bit)
             default:
-                abort()
+                fatalError("Invalid bitwide: \(bit)")
             }
         case let container where container.hasPrefix("[") && container.hasSuffix("]"):
             let element = container.replacingOccurrences(of: "[", with: "").replacingOccurrences(of: "]", with: "")
@@ -105,11 +105,15 @@ indirect enum ModelType {
             case 0:
                 return .array(ModelType.generate(from: element))
             default:
-                abort()
+                fatalError("Invalid format: \(container)")
             }
         default:
             return .object(string.upperCamelCased())
         }
+    }
+    
+    static func ==(_ lhs: ModelType, _ rhs: ModelType) -> Bool {
+        return lhs == rhs
     }
 }
 
@@ -172,6 +176,14 @@ extension ModelDefinition {
                 }
             case .optional(let model):
                 lines.append("\(tab)\(tab)let \(property.name) = jsonObject[\"\(property.key)\"] as? \(model.swiftType)")
+            case .url:
+                lines.append("\(tab)\(tab)guard let \(property.name)String = jsonObject[\"\(property.key)\"] as? String, let \(property.name) = URL(string: \(property.name)String) else {")
+                lines.append("\(tab)\(tab)\(tab)abort()")
+                lines.append("\(tab)\(tab)}")
+            case .date:
+                lines.append("\(tab)\(tab)guard let \(property.name)String = jsonObject[\"\(property.key)\"] as? String, let \(property.name) = DateFormatter.iso8601formatter.date(from: \(property.name)String) else {")
+                lines.append("\(tab)\(tab)\(tab)abort()")
+                lines.append("\(tab)\(tab)}")
             default:
                 lines.append("\(tab)\(tab)guard let \(property.name) = jsonObject[\"\(property.key)\"] as? \(property.type.swiftType) else {")
                 lines.append("\(tab)\(tab)\(tab)abort()")
@@ -191,5 +203,17 @@ extension ModelDefinition {
         lines.append("}")
         
         return lines.reduce("") { $0 + $1 + "\n" }
+    }
+    
+    func hasDate() -> Bool {
+        return properties.reduce(false) {
+            switch $1.type {
+            case .url:
+                return true
+            default:
+                return $0 || false
+            }
+            
+        }
     }
 }
