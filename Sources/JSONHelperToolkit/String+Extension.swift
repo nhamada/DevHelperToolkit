@@ -14,7 +14,7 @@ extension String {
             return ""
         }
         let comps = self.components(separatedBy: CharacterSet(charactersIn: " -_"))
-        return comps.dropFirst().reduce(comps[0], { $0 + $1.capitalized })
+        return comps.dropFirst().reduce(comps[0].lowercased(), { $0 + $1.capitalized })
     }
     
     func upperCamelCased() -> String {

@@ -9,14 +9,23 @@
 import Foundation
 
 indirect enum ModelType {
-    case integer, fraction, string, boolean
+    case integer, unsigned, fraction, string, boolean
     case array(ModelType)
     case object(String)
+    case optional(ModelType)
+    case signedInteger(Int)
+    case unsignedInteger(Int)
+    case singlePrecisionFloating
+    case dictionary(ModelType, ModelType)
+    case url
+    case date
     
     var swiftType: String {
         switch self {
         case .integer:
             return "Int"
+        case .unsigned:
+            return "UInt"
         case .fraction:
             return "Double"
         case .string:
@@ -27,6 +36,79 @@ indirect enum ModelType {
             return "[\(element.swiftType)]"
         case .object(let customClassName):
             return customClassName
+        case .optional(let model):
+            return "\(model.swiftType)?"
+        case .signedInteger(let bit):
+            return "Int\(bit)"
+        case .unsignedInteger(let bit):
+            return "UInt\(bit)"
+        case .singlePrecisionFloating:
+            return "Float"
+        case .dictionary(let key, let value):
+            return "[\(key.swiftType):\(value.swiftType)]"
+        case .url:
+            return "URL"
+        case .date:
+            return "Date"
+        }
+    }
+    
+    static func generate(from string: String) -> ModelType {
+        switch string {
+        case "Int":
+            return .integer
+        case "UInt":
+            return .unsigned
+        case "Bool":
+            return .boolean
+        case "Float":
+            return .singlePrecisionFloating
+        case "Double":
+            return .fraction
+        case "String":
+            return .string
+        case let s where s.hasSuffix("?"):
+            return .optional(ModelType.generate(from: s.replacingOccurrences(of: "?", with: "")))
+        case "URL":
+            return .url
+        case "Date":
+            return .date
+        case let s where s.hasPrefix("Int"):
+            guard let bit = Int(s.replacingOccurrences(of: "Int", with: "")) else {
+                abort()
+            }
+            switch bit {
+            case 8, 16, 32, 64:
+                return .signedInteger(bit)
+            default:
+                abort()
+            }
+        case let s where s.hasPrefix("UInt"):
+            guard let bit = Int(s.replacingOccurrences(of: "UInt", with: "")) else {
+                abort()
+            }
+            switch bit {
+            case 8, 16, 32, 64:
+                return .unsignedInteger(bit)
+            default:
+                abort()
+            }
+        case let container where container.hasPrefix("[") && container.hasSuffix("]"):
+            let element = container.replacingOccurrences(of: "[", with: "").replacingOccurrences(of: "]", with: "")
+            let numberOfColons = element.characters.reduce(0) {
+                return $0 + ($1 == ":" ? 1 : 0)
+            }
+            switch numberOfColons {
+            case 1:
+                let comb = element.components(separatedBy: ":")
+                return .dictionary(ModelType.generate(from: comb[0]), ModelType.generate(from: comb[1]))
+            case 0:
+                return .array(ModelType.generate(from: element))
+            default:
+                abort()
+            }
+        default:
+            return .object(string.upperCamelCased())
         }
     }
 }
@@ -88,6 +170,8 @@ extension ModelDefinition {
                     lines.append("\(tab)\(tab)\(tab)abort()")
                     lines.append("\(tab)\(tab)}")
                 }
+            case .optional(let model):
+                lines.append("\(tab)\(tab)let \(property.name) = jsonObject[\"\(property.key)\"] as? \(model.swiftType)")
             default:
                 lines.append("\(tab)\(tab)guard let \(property.name) = jsonObject[\"\(property.key)\"] as? \(property.type.swiftType) else {")
                 lines.append("\(tab)\(tab)\(tab)abort()")
