@@ -108,7 +108,7 @@ indirect enum ModelType {
                 fatalError("Invalid format: \(container)")
             }
         default:
-            return .object(string.upperCamelCased())
+            return .object(string)
         }
     }
     
@@ -169,6 +169,26 @@ extension ModelDefinition {
                     lines.append("\(tab)\(tab)\(tab)abort()")
                     lines.append("\(tab)\(tab)}")
                     lines.append("\(tab)\(tab)let \(property.name) = \(property.name)Object.map { \(name).decode($0) }")
+                case .url:
+                    lines.append("\(tab)\(tab)guard let \(property.name)Strings = jsonObject[\"\(property.key)\"] as? [String] else {")
+                    lines.append("\(tab)\(tab)\(tab)abort()")
+                    lines.append("\(tab)\(tab)}")
+                    lines.append("\(tab)\(tab)let \(property.name) = \(property.name)Strings.map { (_urlString: String) -> URL in")
+                    lines.append("\(tab)\(tab)\(tab)guard let url = URL(string: _urlString) else {")
+                    lines.append("\(tab)\(tab)\(tab)\(tab)abort()")
+                    lines.append("\(tab)\(tab)\(tab)}")
+                    lines.append("\(tab)\(tab)\(tab)return url")
+                    lines.append("\(tab)\(tab)}")
+                case .date:
+                    lines.append("\(tab)\(tab)guard let \(property.name)Strings = jsonObject[\"\(property.key)\"] as? [String] else {")
+                    lines.append("\(tab)\(tab)\(tab)abort()")
+                    lines.append("\(tab)\(tab)}")
+                    lines.append("\(tab)\(tab)let \(property.name) = \(property.name)Strings.map { (_dateString: String) -> Date in")
+                    lines.append("\(tab)\(tab)\(tab)guard let date = DateFormatter.iso8601formatter.date(from: _dateString) else {")
+                    lines.append("\(tab)\(tab)\(tab)\(tab)abort()")
+                    lines.append("\(tab)\(tab)\(tab)}")
+                    lines.append("\(tab)\(tab)\(tab)return date")
+                    lines.append("\(tab)\(tab)}")
                 default:
                     lines.append("\(tab)\(tab)guard let \(property.name) = jsonObject[\"\(property.key)\"] as? \(property.type.swiftType) else {")
                     lines.append("\(tab)\(tab)\(tab)abort()")

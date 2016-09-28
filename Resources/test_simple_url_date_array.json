@@ -1,0 +1,7 @@
+{
+    "name": "simple url date array model",
+    "properties": {
+        "image_url": "[URL]",
+        "upload_date": "[Date]"
+    }
+}

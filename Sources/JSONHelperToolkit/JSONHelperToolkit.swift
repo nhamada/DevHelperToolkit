@@ -35,15 +35,6 @@ public final class JSONHelperToolkit {
         let topModelName = url.lastPathComponent.replacingOccurrences(of: ".\(url.pathExtension)", with: "").upperCamelCased()
         let outputDirectoryUrl = URL(fileURLWithPath: outputDirectory)
         
-        generateProtocol(to: outputDirectoryUrl, withConfiguration: configuration)
-        
-        let hasDate = jsonModels.reduce(false) {
-            return $0 || $1.hasDate()
-        }
-        if hasDate {
-            generateDateExtension(to: outputDirectoryUrl, withConfiguration: configuration)
-        }
-        
         for model in jsonModels {
             if model.name.isEmpty {
                 model.name = topModelName
@@ -55,6 +46,15 @@ public final class JSONHelperToolkit {
             } catch let error {
                 fatalError(error.localizedDescription)
             }
+        }
+        
+        generateProtocol(to: outputDirectoryUrl, withConfiguration: configuration)
+        
+        let hasDate = jsonModels.reduce(false) {
+            return $0 || $1.hasDate()
+        }
+        if hasDate {
+            generateDateExtension(to: outputDirectoryUrl, withConfiguration: configuration)
         }
     }
     

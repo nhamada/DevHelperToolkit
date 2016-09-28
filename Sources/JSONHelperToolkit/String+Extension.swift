@@ -9,7 +9,10 @@
 import Foundation
 
 extension String {
-    func lowerCamelCased() -> String {
+    func lowerCamelCased(skip: Bool = false) -> String {
+        if skip {
+            return self
+        }
         if self.isEmpty {
             return ""
         }

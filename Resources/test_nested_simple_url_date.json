@@ -1,0 +1,7 @@
+{
+    "name": "nested simple url date model",
+    "properties": {
+        "user": "String",
+        "thumbnails": "[SimpleUrlDateModel]",
+    }
+}
