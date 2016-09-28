@@ -9,12 +9,15 @@
 import Foundation
 
 extension String {
-    func lowerCamelCased() -> String {
+    func lowerCamelCased(skip: Bool = false) -> String {
+        if skip {
+            return self
+        }
         if self.isEmpty {
             return ""
         }
         let comps = self.components(separatedBy: CharacterSet(charactersIn: " -_"))
-        return comps.dropFirst().reduce(comps[0], { $0 + $1.capitalized })
+        return comps.dropFirst().reduce(comps[0].lowercased(), { $0 + $1.capitalized })
     }
     
     func upperCamelCased() -> String {

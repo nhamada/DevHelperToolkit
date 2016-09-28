@@ -39,6 +39,26 @@ class JSONHelperToolkitTests: XCTestCase {
         JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
     }
     
+    func testReadFromSimpleJsonModel() {
+        let filepath = "./Resources/test_simple_json_model.json"
+        JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
+    }
+    
+    func testReadFromSimpleUrlDate() {
+        let filepath = "./Resources/test_simple_url_date.json"
+        JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
+    }
+    
+    func testReadFromNestedSimpleUrlDate() {
+        let filepath = "./Resources/test_nested_simple_url_date.json"
+        JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
+    }
+    
+    func testReadFromSimpleUrlDateArray() {
+        let filepath = "./Resources/test_simple_url_date_array.json"
+        JSONHelperToolkit.shared.generate(from: filepath, to: "./Resources")
+    }
+    
     static var allTests : [(String, (JSONHelperToolkitTests) -> () throws -> Void)] {
         return [
             ("testDictionaryToModel", testDictionaryToModel),
@@ -46,6 +66,10 @@ class JSONHelperToolkitTests: XCTestCase {
             ("testReadFromJsonSimple", testReadFromJsonSimple),
             ("testReadFromJsonUserData", testReadFromJsonUserData),
             ("testReadFromJsonMultiUserData", testReadFromJsonMultiUserData),
+            ("testReadFromSimpleJsonModel", testReadFromSimpleJsonModel),
+            ("testReadFromSimpleUrlDate", testReadFromSimpleUrlDate),
+            ("testReadFromNestedSimpleUrlDate", testReadFromNestedSimpleUrlDate),
+            ("testReadFromSimpleUrlDateArray", testReadFromSimpleUrlDateArray),
         ]
     }
 }

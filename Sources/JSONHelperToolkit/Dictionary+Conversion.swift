@@ -8,8 +8,45 @@
 
 import Foundation
 
+private enum ModelDefinitionKey: String {
+    case name
+    case properties
+}
+
+private let requiredModelDefinitionKeys: [ModelDefinitionKey] = [
+    .name,
+    .properties,
+]
+
 extension Dictionary {
     internal var jsonModels: [ModelDefinition] {
+        return isModelDefinition ? modelJsonModels : actualJsonModels
+    }
+    
+    private var modelJsonModels: [ModelDefinition] {
+        var modelName = ""
+        var properties = [PropertyDefinition]()
+        for (key, value) in self {
+            guard let key = ModelDefinitionKey(rawValue: String(describing: key)) else {
+                fatalError("Unknown key")
+            }
+            switch key {
+            case .name:
+                let value = String(describing: value)
+                modelName = value.upperCamelCased()
+            case .properties:
+                guard let dic = value as? [String:String] else {
+                    fatalError("Failed to convert properties")
+                }
+                for (propName, propValue) in dic {
+                    properties.append(PropertyDefinition(name: propName.lowerCamelCased(), key: propName, type: ModelType.generate(from: propValue)))
+                }
+            }
+        }
+        return [ModelDefinition(name: modelName, properties: properties)]
+    }
+    
+    private var actualJsonModels: [ModelDefinition] {
         var models = [ModelDefinition]()
         
         var properties = [PropertyDefinition]()
@@ -69,5 +106,19 @@ extension Dictionary {
             }
         }
         return dics
+    }
+    
+    private var isModelDefinition: Bool {
+        let required = keys.reduce([ModelDefinitionKey:Int]()) {
+            guard let keyName = $1 as? String, let key = ModelDefinitionKey(rawValue: keyName) else {
+                return $0
+            }
+            var partial = $0
+            partial[key] = (partial[key] ?? 0) + 1
+            return partial
+        }
+        return required.keys.count == requiredModelDefinitionKeys.count && required.reduce(true) {
+            return $0 && ($1.value == 1)
+        }
     }
 }

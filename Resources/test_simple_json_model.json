@@ -1,0 +1,12 @@
+{
+    "name": "simple json model",
+    "properties": {
+        "signed integer": "Int",
+        "unsigned integer": "UInt",
+        "boolean value": "Bool",
+        "string value": "String",
+        "optional string value": "String?",
+        "int array": "[Int]",
+        "dictionary": "[String:Int]"
+    }
+}
