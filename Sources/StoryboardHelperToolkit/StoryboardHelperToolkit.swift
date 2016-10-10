@@ -38,24 +38,36 @@ public final class StoryboardHelperToolkit {
         contents.append("import \(platform.framework)")
         contents.append("")
         contents.append("extension \(platform.className) {")
-        contents.append("\(tab)enum Name {")
         for storyboard in storyboards {
-            contents.append("\(tab)\(tab)case \(storyboard.name.lowerCamelCased) = \"\(storyboard.name)\"")
-        }
-        contents.append("\(tab)}")
-        contents.append("")
-        contents.append("\(tab)enum Identifier {")
-        for storyboard in storyboards {
+            if storyboard.scenes.isEmpty {
+                continue
+            }
+            
+            let name = storyboard.name
+            contents.append("\(tab)enum \(name.upperCamelCased) {")
             for scene in storyboard.scenes {
-                contents.append("\(tab)\(tab)case \(scene.identifier.lowerCamelCased) = \"\(scene.identifier)\"")
+                contents.append("\(tab)\(tab)case \(scene.identifier.lowerCamelCased)")
+            }
+            contents.append("")
+            contents.append("\(tab)\(tab)private var identifier: String {")
+            contents.append("\(tab)\(tab)\(tab)switch self {")
+            for scene in storyboard.scenes {
+                contents.append("\(tab)\(tab)\(tab)case .\(scene.identifier.lowerCamelCased):")
+                contents.append("\(tab)\(tab)\(tab)\(tab)return \"\(scene.identifier)\"")
+            }
+            contents.append("\(tab)\(tab)\(tab)}")
+            contents.append("\(tab)\(tab)}")
+            contents.append("")
+            contents.append("\(tab)\(tab)var viewController: \(platform.viewController) {")
+            contents.append("\(tab)\(tab)\(tab)let storyboard = \(platform.className)(name: \"\(name)\", bundle: nil)")
+            contents.append("\(tab)\(tab)\(tab)return storyboard.instantiateViewController(withIdentifier: self.identifier)")
+            contents.append("\(tab)\(tab)}")
+            contents.append("\(tab)}")
+            
+            if let last = storyboards.last, last.name != storyboard.name {
+                contents.append("")
             }
         }
-        contents.append("\(tab)}")
-        contents.append("")
-        contents.append("\(tab)static func instantiateViewController(name: Name, withIdentifier identifier: Identifier) -> \(platform.viewController) {")
-        contents.append("\(tab)\(tab)let storyboard = \(platform.className)(name: name.rawValue, bundle: nil)")
-        contents.append("\(tab)\(tab)return storyboard.instantiateViewController(withIdentifier: identifier.rawValue)")
-        contents.append("\(tab)}")
         contents.append("}")
         
         return contents.reduce("") { $0 + $1 + "\n" }
