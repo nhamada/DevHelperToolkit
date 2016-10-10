@@ -5,6 +5,7 @@ Swiftプログラマー向けの開発サポートキット
 * JSONのデータモデルの自動生成
 * `UIColor`/`NSColor`のプロパティにアプリ用の定義を追加したExtensionの自動生成
 * Imageアセットから`UIImage`/`NSImage`の名前空間にアセット名に対応した`enum`の定義を追加したExtensionの自動生成
+* ProjectディレクトリからStoryboardで定義されたView Controllerの生成を行うExtensionの自動生成
 
 # Swift version
 `swift-DEVELOPMENT-SNAPSHOT-2016-09-12-a`
@@ -172,3 +173,37 @@ DevHelperToolkit image Assets.xcassets
 
 コマンド実行後、カレントディレクトリに`UIImage+Extension.swift`というファイルが作成されます。
 このファイルをプロジェクトに追加すると、`UIImage.asset.###.image`でアセットとして定義されている画像の`UIImage`を取得できます。
+
+## Storyboard
+```
+DevHelperToolkit image [-o output_directory] [-p {ios, osx}] project_directory
+```
+
+`project_directory`で指定された各Storyboardがあるディレクトリを指定します。
+指定されたディレクトリ内のStoryboardに対応する`UIStoryboard`/`NSStoryboard`のExtensionのswiftファイルを`output_directory`に指定されたディレクトリに出力します。
+`output_directory`が未指定の場合は、カレントディレクトリに作成します。
+`-p ios`で、iOS用 (=`UIImage`)のExtensionを作成します。
+`-p osx`で、macOS用 (=`NSImage`)のExtensionを作成します。
+`-p`オプションが未指定の場合は、iOS用にExtensionを作成します。
+
+### 例
+以下のような構成のプロジェクトディレクトリに対して、Extensionを作成するとします。
+
+```
+/path/to/project
++ SampleProject
++- Base.lproj
+   +- Main.storyboard
++- Settings.storyboard
+...
+```
+
+このプロジェクトディレクトリに対し、以下のコマンドを実行します。
+
+```
+DevHelperToolkit storyboard /path/to/project/SampleProject
+```
+
+コマンド実行後、カレントディレクトリに`UIStoryboard+Extension.swift`というファイルが作成されます。
+`Main.storyboard`内で定義されたView Controllerを取得するときは、`UIStoryboard.Main.###.viewController`を使用します。
+`Settings.storyboard`内で定義されたView Controllerを取得するときは、`UIStoryboard.Settings.###.viewController`を使用します。

@@ -10,6 +10,7 @@ import Foundation
 import JSONHelperToolkit
 import ColorHelperToolkit
 import ImageHelperToolkit
+import StoryboardHelperToolkit
 
 public final class DevHelperToolkit {
     let args: [String]
@@ -35,6 +36,11 @@ public final class DevHelperToolkit {
             let outputDirectory = option.outputDirectory
             let configuration = ImageHelperToolkitConfiguration.configuration(platform: option.imageTargetPlatform)
             ImageHelperToolkit.shared.generate(from: inputFile, to: outputDirectory, withConfiguration: configuration)
+        case .storyboard:
+            let inputFile = option.inputFile
+            let outputDirectory = option.outputDirectory
+            let configuration = StoryboardHelperToolkitConfiguration.configuration(platform: option.storyboardTargetPlatform)
+            StoryboardHelperToolkit.shared.generate(from: inputFile, to: outputDirectory, withConfiguration: configuration)
         }
     }
 }
@@ -68,6 +74,16 @@ extension ToolkitOption {
                     return ""
                 }
                 if case .inputAssetDirectory(source: let source) = param.type {
+                    return source
+                }
+            }
+            return ""
+        case .storyboard:
+            for param in self.parameters {
+                guard let param = param as? StoryboardToolkitParameter else {
+                    return ""
+                }
+                if case .inputProjectDirectory(source: let source) = param.type {
                     return source
                 }
             }
@@ -107,6 +123,16 @@ extension ToolkitOption {
                 }
             }
             return "."
+        case .storyboard:
+            for param in self.parameters {
+                guard let param = param as? StoryboardToolkitParameter else {
+                    return "."
+                }
+                if case .outputDirectory(name: let directory) = param.type {
+                    return directory
+                }
+            }
+            return "."
         }
     }
     
@@ -139,6 +165,26 @@ extension ToolkitOption {
                 }
                 if case .targetPlatform(name: let platformName) = param.type {
                     guard let platform = ImageHelperToolkitConfiguration.TargetPlatform(rawValue: platformName) else {
+                        fatalError("Invalid platform")
+                    }
+                    return platform
+                }
+            }
+            return .ios
+        default:
+            fatalError("Invalid option")
+        }
+    }
+    
+    var storyboardTargetPlatform: StoryboardHelperToolkitConfiguration.TargetPlatform {
+        switch self.mode {
+        case .storyboard:
+            for param in self.parameters {
+                guard let param = param as? StoryboardToolkitParameter else {
+                    fatalError("Invalid parameter")
+                }
+                if case .targetPlatform(name: let platformName) = param.type {
+                    guard let platform = StoryboardHelperToolkitConfiguration.TargetPlatform(rawValue: platformName) else {
                         fatalError("Invalid platform")
                     }
                     return platform
