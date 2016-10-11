@@ -1,14 +1,6 @@
-//
-//  String+Extension.swift
-//  DevHelperToolkit
-//
-//  Created by Naohiro Hamada on 2016/08/30.
-//
-//
-
 import Foundation
 
-extension String {
+public extension String {
     func lowerCamelCased(skip: Bool = false) -> String {
         if skip {
             return self

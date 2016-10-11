@@ -7,16 +7,17 @@
 //
 
 import Foundation
+import FoundationExtensions
 
 extension URL {
     var propertyName: String {
         let name = lastPathComponent.replacingOccurrences(of: ".\(pathExtension)", with: "")
-        return name.lowerCamelCased
+        return name.lowerCamelCased()
     }
     
     var enumName: String {
         let name = lastPathComponent.replacingOccurrences(of: ".\(pathExtension)", with: "")
-        return name.lowerCamelCased
+        return name.lowerCamelCased()
     }
     
     var assetName: String {
