@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FoundationExtensions
 
 public final class JSONHelperToolkit {
     public static let shared: JSONHelperToolkit = JSONHelperToolkit()

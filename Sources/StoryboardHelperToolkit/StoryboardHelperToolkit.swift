@@ -1,4 +1,5 @@
 import Foundation
+import FoundationExtensions
 
 public final class StoryboardHelperToolkit {
     public static let shared = StoryboardHelperToolkit()
@@ -44,15 +45,15 @@ public final class StoryboardHelperToolkit {
             }
             
             let name = storyboard.name
-            contents.append("\(tab)enum \(name.upperCamelCased) {")
+            contents.append("\(tab)enum \(name.upperCamelCased()) {")
             for scene in storyboard.scenes {
-                contents.append("\(tab)\(tab)case \(scene.identifier.lowerCamelCased)")
+                contents.append("\(tab)\(tab)case \(scene.identifier.lowerCamelCased())")
             }
             contents.append("")
             contents.append("\(tab)\(tab)private var identifier: String {")
             contents.append("\(tab)\(tab)\(tab)switch self {")
             for scene in storyboard.scenes {
-                contents.append("\(tab)\(tab)\(tab)case .\(scene.identifier.lowerCamelCased):")
+                contents.append("\(tab)\(tab)\(tab)case .\(scene.identifier.lowerCamelCased()):")
                 contents.append("\(tab)\(tab)\(tab)\(tab)return \"\(scene.identifier)\"")
             }
             contents.append("\(tab)\(tab)\(tab)}")

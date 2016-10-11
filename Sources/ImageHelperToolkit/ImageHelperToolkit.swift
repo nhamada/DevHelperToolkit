@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FoundationExtensions
 
 public final class ImageHelperToolkit {
     public static let shared = ImageHelperToolkit()
