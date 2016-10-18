@@ -1,3 +1,6 @@
+# DevHelperToolkit
+[![codebeat badge](https://codebeat.co/badges/cf32d1d0-fc23-4ad8-8acc-15bbabd91ffc)](https://codebeat.co/projects/github-com-nhamada-devhelpertoolkit)
+
 # 概要
 Swiftプログラマー向けの開発サポートキット
 
