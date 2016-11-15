@@ -17,6 +17,14 @@ public extension FileManager {
         return enumerateStoryboard(atPath: url.path)
     }
     
+    func enumerateStrings(atPath path: String) -> [URL] {
+        return enumerate(at: path, pathExtension: "strings")
+    }
+    
+    func enumerateStrings(at url: URL) -> [URL] {
+        return enumerateStrings(atPath: url.path)
+    }
+    
     private func enumerate(at path:String, pathExtension: String, isDir: Bool = false) -> [URL] {
         guard isDirectory(path), let list = enumerator(atPath: path) else {
             return []

@@ -11,6 +11,7 @@ import JSONHelperToolkit
 import ColorHelperToolkit
 import ImageHelperToolkit
 import StoryboardHelperToolkit
+import StringsHelperToolkit
 
 public final class DevHelperToolkit {
     let args: [String]
@@ -41,6 +42,10 @@ public final class DevHelperToolkit {
             let outputDirectory = option.outputDirectory
             let configuration = StoryboardHelperToolkitConfiguration.configuration(platform: option.storyboardTargetPlatform)
             StoryboardHelperToolkit.shared.generate(from: inputFile, to: outputDirectory, withConfiguration: configuration)
+        case .strings:
+            let inputFile = option.inputFile
+            let outputDirectory = option.outputDirectory
+            StringsHelperToolkit.shared.generate(from: inputFile, to: outputDirectory)
         }
     }
 }
@@ -88,6 +93,16 @@ extension ToolkitOption {
                 }
             }
             return ""
+        case .strings:
+            for param in self.parameters {
+                guard let param = param as? StringsToolkitParameter else {
+                    return ""
+                }
+                if case .inputProjectDirectory(source: let source) = param.type {
+                    return source
+                }
+            }
+            return ""
         }
     }
     
@@ -126,6 +141,16 @@ extension ToolkitOption {
         case .storyboard:
             for param in self.parameters {
                 guard let param = param as? StoryboardToolkitParameter else {
+                    return "."
+                }
+                if case .outputDirectory(name: let directory) = param.type {
+                    return directory
+                }
+            }
+            return "."
+        case .strings:
+            for param in self.parameters {
+                guard let param = param as? StringsToolkitParameter else {
                     return "."
                 }
                 if case .outputDirectory(name: let directory) = param.type {

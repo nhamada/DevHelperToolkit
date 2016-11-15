@@ -1,0 +1,13 @@
+/* 
+  Localizable.strings
+  DevHelperToolkit
+
+  Created by Naohiro Hamada on 2016/11/02.
+
+*/
+
+"Localizable string" = "Localizable string";
+
+"Localizable string with %@" = "Localizable string with %@";
+
+"\"Escaped characters\t\"" = "\"Escaped characters\t\"";
