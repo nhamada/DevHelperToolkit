@@ -32,7 +32,6 @@ public final class StringsHelperToolkit {
         let strings = dic.map {
             generateStrings(table: $0.key, urls: $0.value)
         }
-        print(strings)
         
         let contents = makeContents(strings, configuration)
         

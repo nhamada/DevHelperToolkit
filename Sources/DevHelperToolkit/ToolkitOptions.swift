@@ -13,6 +13,7 @@ enum ToolkitModeOption: String {
     case color
     case image
     case storyboard
+    case strings
 }
 
 protocol ParameterType { }
@@ -38,6 +39,11 @@ enum StoryboardToolkitParameterType: ParameterType {
     case inputProjectDirectory(source: String)
     case outputDirectory(name: String)
     case targetPlatform(name: String)
+}
+
+enum StringsToolkitParameterType: ParameterType {
+    case inputProjectDirectory(source: String)
+    case outputDirectory(name: String)
 }
 
 protocol ToolkitParameter {
@@ -77,6 +83,12 @@ struct StoryboardToolkitParameter: ToolkitParameter {
     let type: StoryboardToolkitParameterType
 }
 
+struct StringsToolkitParameter: ToolkitParameter {
+    let shortName: String
+    let longName: String
+    let type: StringsToolkitParameterType
+}
+
 struct ToolkitOption {
     let mode: ToolkitModeOption
     let parameters: [ToolkitParameter]
@@ -107,6 +119,10 @@ func parseCommandLineArguments() -> ToolkitOption {
         return ToolkitOption(mode: modeOption, parameters: parameters)
     case .storyboard:
         let parser = StoryboardParameterParer()
+        let parameters = parser.parse(parameters: Array(args.dropFirst()))
+        return ToolkitOption(mode: modeOption, parameters: parameters)
+    case .strings:
+        let parser = StringsParameterParser()
         let parameters = parser.parse(parameters: Array(args.dropFirst()))
         return ToolkitOption(mode: modeOption, parameters: parameters)
     }
@@ -267,6 +283,40 @@ private final class StoryboardParameterParer {
                 }
             } else {
                 current.append(StoryboardToolkitParameter(shortName: "", longName: "", type: .inputProjectDirectory(source: first)))
+                rest = parse(parameters: Array(parameters.dropFirst(1)))
+            }
+        }
+        current.append(contentsOf: rest)
+        return current
+    }
+}
+
+private final class StringsParameterParser {
+    private let paramDefinition: [StringsToolkitParameter] = [
+        StringsToolkitParameter(shortName: "", longName: "", type: .inputProjectDirectory(source: "")),
+        StringsToolkitParameter(shortName: "-o", longName: "--output-directory", type: .outputDirectory(name: "")),
+        ]
+    
+    internal func parse(parameters: [String]) -> [ToolkitParameter] {
+        guard let first = parameters.first else {
+            return []
+        }
+        var current = [ToolkitParameter]()
+        var rest = [ToolkitParameter]()
+        for param in paramDefinition {
+            if param.match(first) {
+                switch param.type {
+                case .outputDirectory(name: _):
+                    guard parameters.count > 1 else {
+                        return []
+                    }
+                    current.append(StringsToolkitParameter(shortName: param.shortName, longName: param.longName, type: .outputDirectory(name: parameters[1])))
+                    rest = parse(parameters: Array(parameters.dropFirst(2)))
+                case .inputProjectDirectory(source: _):
+                    return []
+                }
+            } else {
+                current.append(StringsToolkitParameter(shortName: "", longName: "", type: .inputProjectDirectory(source: first)))
                 rest = parse(parameters: Array(parameters.dropFirst(1)))
             }
         }
